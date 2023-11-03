@@ -6,12 +6,6 @@ require 'net/http'
 require 'uri'
 
 class PromptSpec
-  class Error < StandardError; end
-  class FileNotFoundError < Error; end
-  class ParseError < Error; end
-  class RequiredParameterError < Error; end
-  class EndpointError < Error; end
-
   attr_reader :file_path, :validate_required_params
 
   def initialize(file_path, validate_required_params: true)
@@ -21,7 +15,7 @@ class PromptSpec
   end
 
   def call(**parameters)
-    validate_required_inputs!(parameters) if validate_required_params
+    validate_required_inputs!(parameters) if @validate_required_params
     parse_prompt_messages(parameters)
     construct_endpoint_request
   end
@@ -75,9 +69,7 @@ class PromptSpec
   def construct_default_endpoint
     @model = @yaml_content['prompt']['model']
     case @model
-    when 'gpt-4'
-      'https://api.openai.com/v1/chat/completions'
-    when 'gpt-3.5-turbo'
+    when 'gpt-4', 'gpt-4-0613', 'gpt-4-32k', 'gpt-4-32k-0613', 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-3.5-turbo-0613', 'gpt-3.5-turbo-16k-0613'
       'https://api.openai.com/v1/chat/completions'
     else
       raise EndpointError, "Unknown model: #{model}"
@@ -85,14 +77,18 @@ class PromptSpec
   end
 
   def construct_headers
-    # Placeholder logic for constructing headers
     headers = @yaml_content['headers'] || {}
-    if @model == 'gpt-4' && headers.empty?
-      api_key = ENV['OPENAI_API_KEY']
-      raise EndpointError, "Missing OpenAI API Key" unless api_key
-      headers['Authorization'] = "Bearer #{api_key}"
+
+    if headers.empty?
+      case @model
+      when 'gpt-4', 'gpt-4-0613', 'gpt-4-32k', 'gpt-4-32k-0613', 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-3.5-turbo-0613', 'gpt-3.5-turbo-16k-0613'
+        api_key = ENV['OPENAI_API_KEY']
+        headers['Authorization'] = "Bearer #{api_key}" if api_key
+      # Add more cases here for other providers
+      end
     end
-    headers['Content-Type'] = 'application/json'
+
+    headers['Content-Type'] = 'application/json' unless headers.key?('Content-Type')
     headers
   end
 end

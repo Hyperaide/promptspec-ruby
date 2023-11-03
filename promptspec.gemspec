@@ -1,7 +1,7 @@
 # promptspec.gemspec
 Gem::Specification.new do |spec|
   spec.name          = "promptspec"
-  spec.version       = "0.0.4"
+  spec.version       = "0.0.5"
   spec.authors       = ["Hyperaide, John Paul, Daniel Paul"]
   spec.email         = ["jp@hyperaide.com"]
 
@@ -14,7 +14,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "yaml", "~> 0.1.0"
-  spec.add_runtime_dependency "erb", "~> 2.2.0"
 
   spec.add_development_dependency "bundler", "~> 2.0"
   spec.add_development_dependency "rake", "~> 13.0"
