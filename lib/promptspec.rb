@@ -48,7 +48,7 @@ class PromptSpec
   end
 
   def construct_endpoint_request
-    endpoint = @yaml_content['endpoint'] || construct_default_endpoint
+    endpoint = @yaml_content['url'] || construct_default_endpoint
     headers = construct_headers
     payload = @yaml_content['prompt']
   
@@ -78,17 +78,19 @@ class PromptSpec
 
   def construct_headers
     @headers ||= begin
-      headers = @yaml_content.fetch('headers', {})
-
-      if headers.empty?
-        case @model
-        when 'gpt-4', 'gpt-4-0613', 'gpt-4-32k', 'gpt-4-32k-0613', 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-3.5-turbo-0613', 'gpt-3.5-turbo-16k-0613'
-          api_key = ENV['OPENAI_API_KEY']
-          headers['Authorization'] = "Bearer #{api_key}" if api_key
-        # Add more cases here for other providers
-        end
+      yaml_headers = @yaml_content.fetch('headers', {})
+      headers = {}
+  
+      case @model
+      when 'gpt-4', 'gpt-4-0613', 'gpt-4-32k', 'gpt-4-32k-0613', 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-3.5-turbo-0613', 'gpt-3.5-turbo-16k-0613'
+        api_key = ENV['OPENAI_API_KEY']
+        headers['Authorization'] = "Bearer #{api_key}" if api_key
+      # Add more cases here for other providers
       end
-
+      else
+        headers.merge!(yaml_headers)
+      end
+  
       headers['Content-Type'] = 'application/json' unless headers.key?('Content-Type')
       headers
     end

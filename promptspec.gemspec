@@ -1,7 +1,7 @@
 # promptspec.gemspec
 Gem::Specification.new do |spec|
   spec.name          = "promptspec"
-  spec.version       = "0.0.6"
+  spec.version       = "0.0.7"
   spec.authors       = ["Hyperaide, John Paul, Daniel Paul"]
   spec.email         = ["jp@hyperaide.com"]
 
